@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Silent Signals - Emergency Alert System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/home.css">
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="nav-logo">
+            <i class="fas fa-shield-alt"></i>
+            <span>Silent Signals</span>
+        </div>
+        <div class="nav-menu">
+            <a href="#dashboard" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="#contacts" class="nav-link"><i class="fas fa-users"></i> Contacts</a>
+            <a href="#profile" class="nav-link"><i class="fas fa-user"></i> Profile</a>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="section active">
+        <div class="dashboard-header">
+            <h1>Emergency Dashboard</h1>
+            <p>Welcome back, <span id="username">User</span></p>
+        </div>
+
+        <div class="sos-section">
+            <div class="location-info">
+                <div class="location-header">
+                    <i class="fas fa-location-dot"></i>
+                    Current Location
+                    <button class="refresh-location" onclick="getCurrentLocation()">
+                        <i class="fas fa-refresh"></i> Refresh
+                    </button>
+                </div>
+                <div class="location-details">
+                    <div class="coordinate">
+                        <label>Coordinates:</label>
+                        <span id="coordinates">
+                                <span id="latitude">--</span>, <span id="longitude">--</span>
+                            </span>
+                    </div>
+                    <div class="address">
+                        <label>Address:</label>
+                        <span id="address">Acquiring location...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert-description">
+                <label for="description">
+                    <i class="fas fa-comment"></i> Emergency Description
+                </label>
+                <textarea
+                        id="description"
+                        placeholder="Describe your emergency situation... (required)"
+                        maxlength="500"
+                ></textarea>
+            </div>
+
+            <div class="sos-button-container">
+                <button class="sos-button" onclick="sendSOS()">
+                    <i class="fas fa-bell"></i>
+                    SEND SOS ALERT
+                </button>
+                <p class="sos-warning">
+                    This will notify all your trusted contacts immediately
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contacts Section -->
+    <section id="contacts" class="section">
+        <div class="section-header">
+            <h2>Trusted Contacts</h2>
+            <button class="add-btn" onclick="showAddContactModal()">
+                <i class="fas fa-plus"></i> Add Contact
+            </button>
+        </div>
+        <div class="contacts-list" id="contactsList">
+            <!-- Contacts will be loaded here -->
+        </div>
+    </section>
+
+    <!-- Profile Section -->
+    <section id="profile" class="section">
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-info">
+                    <h3 id="profileUsername">Loading...</h3>
+                    <p id="profileEmail">Loading...</p>
+                </div>
+            </div>
+            <div class="profile-details">
+                <div class="detail-item">
+                    <label><i class="fas fa-id-card"></i> User ID</label>
+                    <span id="profileId">--</span>
+                </div>
+                <div class="detail-item">
+                    <label><i class="fas fa-envelope"></i> Email Verified</label>
+                    <span class="status-badge" id="profileEmailVerified">Loading...</span>
+                </div>
+                <div class="detail-item">
+                    <label><i class="fas fa-calendar"></i> Date of Birth</label>
+                    <span id="profileDob">--</span>
+                </div>
+                <div class="detail-item">
+                    <label><i class="fas fa-user-check"></i> Account Status</label>
+                    <span class="status-badge" id="profileStatus">Loading...</span>
+                </div>
+                <div class="detail-item">
+                    <label><i class="fas fa-clock"></i> Member Since</label>
+                    <span id="profileCreatedAt">--</span>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Add Contact Modal -->
+<!-- Add Contact Modal -->
+<div id="addContactModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add Trusted Contact</h3>
+            <span class="close" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="contactFullName">Full Name *</label>
+                    <input type="text" id="contactFullName" required placeholder="Enter full name">
+                </div>
+                <div class="form-group">
+                    <label for="contactMail">Email Address *</label>
+                    <input type="email" id="contactMail" required placeholder="Enter email address">
+                </div>
+                <div class="form-group">
+                    <label for="contactPhone">Phone Number (Optional)</label>
+                    <input type="tel" id="contactPhone" placeholder="Enter phone number (optional)">
+                </div>
+                <div class="form-group">
+                    <label for="contactType">Contact Type *</label>
+                    <select id="contactType" required>
+                        <option value="">Select type</option>
+                        <option value="FAMILY">Family</option>
+                        <option value="FRIEND">Friend</option>
+                        <option value="EMERGENCY_CONTACT">Emergency Contact</option>
+                        <option value="COLLEAGUE">Colleague</option>
+                        <option value="NEIGHBOR">Neighbor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="contactPriority">Priority Order</label>
+                    <input type="number" id="contactPriority" min="1" max="10" value="1" placeholder="1-10 (lower = higher priority)">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Add Contact</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loading" class="loading">
+    <div class="spinner"></div>
+</div>
+
+<!-- Notifications Container -->
+<div id="notificationContainer"></div>
+
+<script src="/home.js"></script>
+</body>
+</html>
