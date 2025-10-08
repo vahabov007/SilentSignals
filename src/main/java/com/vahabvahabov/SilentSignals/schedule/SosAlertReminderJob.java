@@ -33,7 +33,6 @@ public class SosAlertReminderJob implements Job {
         try {
             logger.info("Running SOS Alert Reminder Job at {}", LocalDateTime.now());
 
-            // Fetch active alerts that need reminders
             List<SOSAlert> alertsNeedingReminders = getAlertsNeedingReminders();
 
             logger.info("Found {} alerts needing reminders", alertsNeedingReminders.size());
@@ -46,7 +45,6 @@ public class SosAlertReminderJob implements Job {
                     logger.info("Sending reminder for SOS Alert ID: {} (User ID: {})",
                             alert.getId(), alert.getUser().getId());
 
-                    // Use the dedicated reminder method that bypasses rate limiting
                     alertService.sendReminderAlert(
                             alert.getUser().getId(),
                             extractOriginalDescription(alert.getDescription()),
@@ -60,7 +58,6 @@ public class SosAlertReminderJob implements Job {
                 } catch (Exception e) {
                     failedReminders++;
                     logger.error("Failed to send reminder for alert ID {}: {}", alert.getId(), e.getMessage());
-                    // Continue with other alerts even if one fails
                 }
             }
 
@@ -73,11 +70,7 @@ public class SosAlertReminderJob implements Job {
         }
     }
 
-    /**
-     * Get alerts that need reminders:
-     * - Active alerts triggered more than 5 minutes ago
-     * - Not already reminder alerts (to avoid reminder loops)
-     */
+
     private List<SOSAlert> getAlertsNeedingReminders() {
         List<SOSAlert> activeAlerts = sosAlertRepository.findByAlertStatus(AlertStatus.ACTIVE);
 
@@ -94,9 +87,7 @@ public class SosAlertReminderJob implements Job {
                 .collect(java.util.stream.Collectors.toList());
     }
 
-    /**
-     * Extract original description from reminder alerts
-     */
+   
     private String extractOriginalDescription(String description) {
         if (description.startsWith("REMINDER: ")) {
             return description.substring("REMINDER: ".length());
