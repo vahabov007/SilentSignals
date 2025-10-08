@@ -76,10 +76,8 @@ public class SosAlertReminderJob implements Job {
 
         return activeAlerts.stream()
                 .filter(alert -> {
-                    // Check if alert was triggered more than 5 minutes ago
                     boolean needsReminder = alert.getTriggeredAt().isBefore(LocalDateTime.now().minusMinutes(5));
 
-                    // Don't send reminders for reminder alerts (avoid infinite loops)
                     boolean isNotReminder = !alert.getDescription().startsWith("REMINDER:");
 
                     return needsReminder && isNotReminder;
@@ -87,7 +85,7 @@ public class SosAlertReminderJob implements Job {
                 .collect(java.util.stream.Collectors.toList());
     }
 
-   
+
     private String extractOriginalDescription(String description) {
         if (description.startsWith("REMINDER: ")) {
             return description.substring("REMINDER: ".length());
