@@ -31,8 +31,8 @@ class DatabaseSchemaInitializer implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		String schemaSql = "CREATE SCHEMA IF NOT EXISTS login_page";
+		String schemaSql = "CREATE SCHEMA IF NOT EXISTS silent_signals";
 		jdbcTemplate.execute(schemaSql);
-		System.out.println("Schema 'login_page' created successfully.");
+		System.out.println("Schema 'silent_signals' created successfully.");
 	}
 }

@@ -1,4 +1,3 @@
-// Global variables
 let currentUser = null;
 let currentLocation = {
     latitude: null,
@@ -6,16 +5,15 @@ let currentLocation = {
     address: null
 };
 
-// Initialize application
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
     setupNavigation();
     getCurrentLocation();
     loadUserProfile();
     loadContacts();
+    setupCharacterCounter();
 });
 
-// Initialize app
 function initializeApp() {
     const token = localStorage.getItem('jwtToken');
     if (!token) {
@@ -24,7 +22,6 @@ function initializeApp() {
     }
 }
 
-// Navigation
 function setupNavigation() {
     const links = document.querySelectorAll('.nav-link');
     links.forEach(link => {
@@ -51,7 +48,15 @@ function showSection(sectionId) {
     }
 }
 
-// Location Services
+function setupCharacterCounter() {
+    const textarea = document.getElementById('description');
+    const counter = document.getElementById('char-counter');
+
+    textarea.addEventListener('input', function() {
+        counter.textContent = this.value.length;
+    });
+}
+
 function getCurrentLocation() {
     showLoading(true);
 
@@ -118,7 +123,7 @@ function handleLocationError(error) {
     showError(message);
 }
 
-// SOS Alert with better error handling for Redis issues
+// SOS Alert
 async function sendSOS() {
     const description = document.getElementById('description').value.trim();
 
@@ -161,16 +166,14 @@ async function sendSOS() {
         if (result.success) {
             showSuccess('SOS alert sent successfully! Help is on the way!');
             document.getElementById('description').value = '';
+            document.getElementById('char-counter').textContent = '0';
         } else {
-            // Handle specific error cases
             if (result.message && result.message.includes('Rate limit exceeded')) {
                 const timeMatch = result.message.match(/(\d+) seconds/);
                 const seconds = timeMatch ? timeMatch[1] : 'a few';
                 showError(`Please wait ${seconds} seconds before sending another alert.`);
             } else if (result.message && result.message.includes('Redis')) {
-                // Try fallback method or show user-friendly message
                 showError('Alert system is temporarily unavailable. Please try again in a moment.');
-                // You could implement a fallback here that saves alerts to database only
             } else {
                 showError(result.message || 'Failed to send SOS alert');
             }
@@ -183,8 +186,7 @@ async function sendSOS() {
     }
 }
 
-
-// User Profile - FIXED: Correct element IDs
+// User Profile
 async function loadUserProfile() {
     try {
         const token = localStorage.getItem('jwtToken');
@@ -196,7 +198,6 @@ async function loadUserProfile() {
 
         if (response.ok) {
             const result = await response.json();
-            console.log('Profile response:', result); // Debug log
             if (result.success) {
                 currentUser = result.data;
                 displayUserProfile(currentUser);
@@ -204,7 +205,6 @@ async function loadUserProfile() {
                 showError('Failed to load profile: ' + (result.message || 'Unknown error'));
             }
         } else {
-            console.error('Profile HTTP error:', response.status);
             if (response.status === 401) {
                 localStorage.removeItem('jwtToken');
                 window.location.href = '/my-login';
@@ -219,8 +219,6 @@ async function loadUserProfile() {
 }
 
 function displayUserProfile(user) {
-    console.log('Displaying user:', user); // Debug log
-
     // Update username in dashboard
     document.getElementById('username').textContent = user.username;
 
@@ -270,10 +268,13 @@ async function loadContacts() {
         });
 
         const result = await response.json();
-        console.log('Contacts response:', result); // Debug log
 
         if (result.success) {
             displayContacts(result.data || []);
+
+            // Update contacts count in dashboard
+            const contactsCount = result.data ? result.data.length : 0;
+            document.getElementById('contacts-count').textContent = `${contactsCount} contacts`;
         } else {
             showError('Failed to load contacts: ' + (result.message || 'Unknown error'));
         }
@@ -283,10 +284,8 @@ async function loadContacts() {
     }
 }
 
-
 function displayContacts(contacts) {
     const container = document.getElementById('contactsList');
-    console.log('Displaying contacts:', contacts); // Debug log
 
     if (!contacts || contacts.length === 0) {
         container.innerHTML = `
@@ -306,10 +305,10 @@ function displayContacts(contacts) {
                 <span class="contact-type">${formatContactType(contact.contactType)}</span>
             </div>
             <div class="contact-details">
-                ${contact.email ? ` <!-- FIXED: Changed from contact.mail to contact.email -->
+                ${contact.email ? `
                     <div class="contact-detail">
                         <i class="fas fa-envelope"></i>
-                        <span>${escapeHtml(contact.email)}</span> <!-- FIXED: Changed from contact.mail to contact.email -->
+                        <span>${escapeHtml(contact.email)}</span>
                     </div>
                 ` : ''}
                 ${contact.phone ? `
@@ -346,7 +345,7 @@ function formatContactType(contactType) {
     return typeMap[contactType] || contactType;
 }
 
-// FIXED: Delete contact uses userId instead of username
+// Delete contact
 async function deleteContact(contactId) {
     if (!confirm('Are you sure you want to delete this contact?')) {
         return;
@@ -361,9 +360,6 @@ async function deleteContact(contactId) {
     try {
         const token = localStorage.getItem('jwtToken');
 
-        console.log(`Deleting contact: contactId=${contactId}`);
-
-        // FIXED: Remove userId from URL - let backend get it from security context
         const response = await fetch(`/trusted/api/deleteContact/${contactId}`, {
             method: 'DELETE',
             headers: {
@@ -372,13 +368,11 @@ async function deleteContact(contactId) {
         });
 
         const result = await response.json();
-        console.log('Delete response:', result);
 
         if (result.success) {
             showSuccess('Contact deleted successfully!');
             loadContacts();
         } else {
-            // More specific error messages
             if (result.message && result.message.includes('permission')) {
                 showError('You do not have permission to delete this contact.');
             } else if (result.message && result.message.includes('not found')) {
@@ -414,8 +408,6 @@ window.onclick = function(event) {
 }
 
 // Contact Form Submission
-// Contact Form Submission - Updated with optional phone
-// Contact Form Submission - Updated to match new field name
 document.getElementById('contactForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
@@ -453,7 +445,6 @@ document.getElementById('contactForm').addEventListener('submit', async function
             return;
         }
     } else {
-        // Set to null if empty
         formData.phone = null;
     }
 
@@ -468,9 +459,6 @@ document.getElementById('contactForm').addEventListener('submit', async function
     try {
         const token = localStorage.getItem('jwtToken');
 
-        console.log('Adding trusted contact for current user:', formData);
-
-        // FIXED: Remove username from URL - let backend get it from security context
         const response = await fetch('/trusted/api/addContact', {
             method: 'POST',
             headers: {
@@ -481,14 +469,12 @@ document.getElementById('contactForm').addEventListener('submit', async function
         });
 
         const result = await response.json();
-        console.log('Add contact response:', result);
 
         if (result.success) {
             showSuccess('Contact added successfully!');
             closeModal();
             loadContacts();
         } else {
-            // Enhanced error handling
             if (result.data && typeof result.data === 'object') {
                 const errors = Object.values(result.data).join(', ');
                 showError('Please check your input: ' + errors);
@@ -536,7 +522,6 @@ function showNotification(message, type = 'info') {
 
     container.appendChild(notification);
 
-    // Auto remove after 5 seconds
     setTimeout(() => {
         if (notification.parentNode) {
             notification.remove();
@@ -552,25 +537,20 @@ function escapeHtml(text) {
 }
 
 // Logout
-// Logout - Fixed version
 function logout() {
     if (confirm('Are you sure you want to logout?')) {
-        // Clear all stored data
         localStorage.removeItem('jwtToken');
         localStorage.removeItem('userData');
         sessionStorage.clear();
 
-        // Clear any cookies that might be set
         document.cookie.split(";").forEach(function(c) {
             document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
         });
 
-        // Redirect to the correct login page
-        window.location.href = '/my-login'; // Changed from '/custom-login' to '/my-login'
+        window.location.href = '/my-login';
     }
 }
 
-// Make functions global
 window.getCurrentLocation = getCurrentLocation;
 window.sendSOS = sendSOS;
 window.showAddContactModal = showAddContactModal;

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Silent Signals - Emergency Alert System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/home.css">
+    <link rel="stylesheet" href="home.css">
 </head>
 <body>
 <!-- Navigation -->
@@ -28,109 +28,149 @@
 <main class="main-content">
     <!-- Dashboard Section -->
     <section id="dashboard" class="section active">
-        <div class="dashboard-header">
-            <h1>Emergency Dashboard</h1>
-            <p>Welcome back, <span id="username">User</span></p>
-        </div>
+        <div class="dashboard-grid">
+            <div class="dashboard-header">
+                <h1>Emergency Dashboard</h1>
+                <p>Welcome back, <span id="username">User</span></p>
+            </div>
 
-        <div class="sos-section">
-            <div class="location-info">
-                <div class="location-header">
-                    <i class="fas fa-location-dot"></i>
-                    Current Location
-                    <button class="refresh-location" onclick="getCurrentLocation()">
-                        <i class="fas fa-refresh"></i> Refresh
+            <div class="dashboard-cards">
+                <div class="status-card">
+                    <div class="card-icon">
+                        <i class="fas fa-shield-check"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>System Status</h3>
+                        <p class="status-active">All Systems Operational</p>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <div class="card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Trusted Contacts</h3>
+                        <p id="contacts-count">Loading...</p>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <div class="card-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Recent Alerts</h3>
+                        <p>No recent alerts</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sos-section">
+                <div class="location-info">
+                    <div class="location-header">
+                        <i class="fas fa-location-dot"></i>
+                        Current Location
+                        <button class="refresh-location" onclick="getCurrentLocation()">
+                            <i class="fas fa-refresh"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="location-details">
+                        <div class="coordinate">
+                            <label>Coordinates:</label>
+                            <span id="coordinates">
+                                    <span id="latitude">--</span>, <span id="longitude">--</span>
+                                </span>
+                        </div>
+                        <div class="address">
+                            <label>Address:</label>
+                            <span id="address">Acquiring location...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert-description">
+                    <label for="description">
+                        <i class="fas fa-comment"></i> Emergency Description
+                    </label>
+                    <textarea
+                            id="description"
+                            placeholder="Describe your emergency situation... (required)"
+                            maxlength="500"
+                    ></textarea>
+                    <div class="char-count">
+                        <span id="char-counter">0</span>/500 characters
+                    </div>
+                </div>
+
+                <div class="sos-button-container">
+                    <button class="sos-button" onclick="sendSOS()">
+                        <i class="fas fa-bell"></i>
+                        SEND SOS ALERT
                     </button>
+                    <p class="sos-warning">
+                        This will notify all your trusted contacts immediately
+                    </p>
                 </div>
-                <div class="location-details">
-                    <div class="coordinate">
-                        <label>Coordinates:</label>
-                        <span id="coordinates">
-                                <span id="latitude">--</span>, <span id="longitude">--</span>
-                            </span>
-                    </div>
-                    <div class="address">
-                        <label>Address:</label>
-                        <span id="address">Acquiring location...</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="alert-description">
-                <label for="description">
-                    <i class="fas fa-comment"></i> Emergency Description
-                </label>
-                <textarea
-                        id="description"
-                        placeholder="Describe your emergency situation... (required)"
-                        maxlength="500"
-                ></textarea>
-            </div>
-
-            <div class="sos-button-container">
-                <button class="sos-button" onclick="sendSOS()">
-                    <i class="fas fa-bell"></i>
-                    SEND SOS ALERT
-                </button>
-                <p class="sos-warning">
-                    This will notify all your trusted contacts immediately
-                </p>
             </div>
         </div>
     </section>
 
     <!-- Contacts Section -->
     <section id="contacts" class="section">
-        <div class="section-header">
-            <h2>Trusted Contacts</h2>
-            <button class="add-btn" onclick="showAddContactModal()">
-                <i class="fas fa-plus"></i> Add Contact
-            </button>
-        </div>
-        <div class="contacts-list" id="contactsList">
-            <!-- Contacts will be loaded here -->
+        <div class="section-container">
+            <div class="section-header">
+                <h2>Trusted Contacts</h2>
+                <button class="add-btn" onclick="showAddContactModal()">
+                    <i class="fas fa-plus"></i> Add Contact
+                </button>
+            </div>
+            <div class="contacts-list" id="contactsList">
+                <!-- Contacts will be loaded here -->
+            </div>
         </div>
     </section>
 
     <!-- Profile Section -->
     <section id="profile" class="section">
-        <div class="profile-card">
-            <div class="profile-header">
-                <div class="avatar">
-                    <i class="fas fa-user"></i>
+        <div class="section-container">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h3 id="profileUsername">Loading...</h3>
+                        <p id="profileEmail">Loading...</p>
+                    </div>
                 </div>
-                <div class="profile-info">
-                    <h3 id="profileUsername">Loading...</h3>
-                    <p id="profileEmail">Loading...</p>
-                </div>
-            </div>
-            <div class="profile-details">
-                <div class="detail-item">
-                    <label><i class="fas fa-id-card"></i> User ID</label>
-                    <span id="profileId">--</span>
-                </div>
-                <div class="detail-item">
-                    <label><i class="fas fa-envelope"></i> Email Verified</label>
-                    <span class="status-badge" id="profileEmailVerified">Loading...</span>
-                </div>
-                <div class="detail-item">
-                    <label><i class="fas fa-calendar"></i> Date of Birth</label>
-                    <span id="profileDob">--</span>
-                </div>
-                <div class="detail-item">
-                    <label><i class="fas fa-user-check"></i> Account Status</label>
-                    <span class="status-badge" id="profileStatus">Loading...</span>
-                </div>
-                <div class="detail-item">
-                    <label><i class="fas fa-clock"></i> Member Since</label>
-                    <span id="profileCreatedAt">--</span>
+                <div class="profile-details">
+                    <div class="detail-item">
+                        <label><i class="fas fa-id-card"></i> User ID</label>
+                        <span id="profileId">--</span>
+                    </div>
+                    <div class="detail-item">
+                        <label><i class="fas fa-envelope"></i> Email Verified</label>
+                        <span class="status-badge" id="profileEmailVerified">Loading...</span>
+                    </div>
+                    <div class="detail-item">
+                        <label><i class="fas fa-calendar"></i> Date of Birth</label>
+                        <span id="profileDob">--</span>
+                    </div>
+                    <div class="detail-item">
+                        <label><i class="fas fa-user-check"></i> Account Status</label>
+                        <span class="status-badge" id="profileStatus">Loading...</span>
+                    </div>
+                    <div class="detail-item">
+                        <label><i class="fas fa-clock"></i> Member Since</label>
+                        <span id="profileCreatedAt">--</span>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 </main>
 
-<!-- Add Contact Modal -->
 <!-- Add Contact Modal -->
 <div id="addContactModal" class="modal">
     <div class="modal-content">
@@ -184,6 +224,6 @@
 <!-- Notifications Container -->
 <div id="notificationContainer"></div>
 
-<script src="/home.js"></script>
+<script src="home.js"></script>
 </body>
 </html>
