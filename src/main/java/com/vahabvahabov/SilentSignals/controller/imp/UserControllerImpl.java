@@ -32,9 +32,7 @@ public class UserControllerImpl implements UserController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             if (authentication == null || !authentication.isAuthenticated() || !(authentication.getPrincipal() instanceof User)) {
-                return ResponseEntity.status(401).body(
-                        Map.of("success", false, "message", "User not authenticated")
-                );
+                return ResponseEntity.status(401).body(createResponse(false, "User not authenticated"));
             }
 
             User user = (User) authentication.getPrincipal();
@@ -49,16 +47,18 @@ public class UserControllerImpl implements UserController {
             userProfile.put("emailVerified", user.isEmailVerified());
             userProfile.put("createdAt", user.getCreatedAt());
 
-            return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "data", userProfile
-            ));
+            return ResponseEntity.ok(createResponse(true, userProfile));
 
         } catch (Exception e) {
             logger.error("Error loading user profile: {}", e.getMessage());
-            return ResponseEntity.status(500).body(
-                    Map.of("success", false, "message", "Failed to load user profile")
-            );
+            return ResponseEntity.status(500).body(createResponse(false, "Failed to load user profile"));
         }
+
+    }
+    private Map<String, Object> createResponse(boolean success, Object message) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", success);
+        response.put("message", message);
+        return response;
     }
 }

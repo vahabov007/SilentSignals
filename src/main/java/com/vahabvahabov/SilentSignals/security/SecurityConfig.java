@@ -1,5 +1,6 @@
 package com.vahabvahabov.SilentSignals.security;
 
+import com.vahabvahabov.SilentSignals.model.User;
 import com.vahabvahabov.SilentSignals.repository.UserRepository;
 import com.vahabvahabov.SilentSignals.security.jwt.JwtRequestFilter;
 import com.vahabvahabov.SilentSignals.security.jwt.JwtUtil;
@@ -18,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.Optional;
 
 @Slf4j
 @Configuration
@@ -40,9 +43,16 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return usernameOrMail -> {
-            return userRepository.findByMail(usernameOrMail)
-                    .or(() -> userRepository.findByUsername(usernameOrMail))
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + usernameOrMail));
+            Optional<User> userOptional = userRepository.findByMail(usernameOrMail);
+
+            if (userOptional.isEmpty()) {
+                userOptional = userRepository.findByUsername(usernameOrMail);
+            }
+            if(userOptional.isEmpty()) {
+                throw new UsernameNotFoundException("Username not found.");
+            }
+            return userOptional.get();
+
         };
     }
 

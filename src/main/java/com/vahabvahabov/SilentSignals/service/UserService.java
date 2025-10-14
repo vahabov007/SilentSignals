@@ -8,7 +8,5 @@ public interface UserService {
 
     Optional<User> findUserByUsername(String username);
 
-    boolean isUserExists(String mail);
-
     void saveNewUser(User user);
 }

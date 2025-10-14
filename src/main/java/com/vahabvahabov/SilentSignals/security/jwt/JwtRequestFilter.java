@@ -87,7 +87,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     private boolean isPublicEndpoint(String requestURI) {
         return requestURI.startsWith("/api/auth/") ||
-                requestURI.startsWith("/api/register/") || // FIXED: Added registration endpoints
+                requestURI.startsWith("/api/register/") ||
                 requestURI.startsWith("/api/forgot-password") ||
                 requestURI.equals("/my-login") ||
                 requestURI.equals("/register") ||

@@ -32,26 +32,19 @@ public class SosAlertReminderJob implements Job {
     public void execute(JobExecutionContext context) throws JobExecutionException {
         try {
             logger.info("Running SOS Alert Reminder Job at {}", LocalDateTime.now());
-
             List<SOSAlert> alertsNeedingReminders = getAlertsNeedingReminders();
-
-            logger.info("Found {} alerts needing reminders", alertsNeedingReminders.size());
-
             int successfulReminders = 0;
             int failedReminders = 0;
-
             for (SOSAlert alert : alertsNeedingReminders) {
                 try {
                     logger.info("Sending reminder for SOS Alert ID: {} (User ID: {})",
                             alert.getId(), alert.getUser().getId());
-
                     alertService.sendReminderAlert(
                             alert.getUser().getId(),
                             extractOriginalDescription(alert.getDescription()),
                             alert.getLocationCoordinates(),
                             alert.getLocationAddress()
                     );
-
                     successfulReminders++;
                     logger.info("Reminder sent successfully for alert ID: {}", alert.getId());
 
@@ -60,13 +53,11 @@ public class SosAlertReminderJob implements Job {
                     logger.error("Failed to send reminder for alert ID {}: {}", alert.getId(), e.getMessage());
                 }
             }
-
             logger.info("SOS Alert Reminder Job completed. Success: {}, Failed: {}, Total: {}",
                     successfulReminders, failedReminders, alertsNeedingReminders.size());
-
         } catch (Exception e) {
             logger.error("Error in SOS Alert Reminder Job: {}", e.getMessage(), e);
-            throw new JobExecutionException("Failed to execute SOS Alert Reminder Job", e, false); // Don't refire immediately
+            throw new JobExecutionException("Failed to execute SOS Alert Reminder Job", e, false);
         }
     }
 
@@ -77,9 +68,7 @@ public class SosAlertReminderJob implements Job {
         return activeAlerts.stream()
                 .filter(alert -> {
                     boolean needsReminder = alert.getTriggeredAt().isBefore(LocalDateTime.now().minusMinutes(5));
-
                     boolean isNotReminder = !alert.getDescription().startsWith("REMINDER:");
-
                     return needsReminder && isNotReminder;
                 })
                 .collect(java.util.stream.Collectors.toList());

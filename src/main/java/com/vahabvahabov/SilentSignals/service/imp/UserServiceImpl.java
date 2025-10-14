@@ -26,11 +26,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean isUserExists(String mail) {
-        return userRepository.findByMail(mail).isPresent();
-    }
-
-    @Override
     public void saveNewUser(User user) {
         userRepository.save(user);
     }

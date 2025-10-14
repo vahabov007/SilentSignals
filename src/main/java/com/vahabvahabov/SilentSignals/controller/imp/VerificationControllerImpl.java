@@ -52,15 +52,11 @@ public class VerificationControllerImpl implements VerificationController {
         if (existingUser.isPresent()) {
             return ResponseEntity.badRequest().body(createResponse(false, "This email address is already registered!"));
         }
-
         String pin = String.format("%06d", new Random().nextInt(999999));
         Date expirationTime = new Date(System.currentTimeMillis() + 10 * 60 * 1000); // 10 minutes
-
         pinStorage.put(mail, pin);
         pinExpirationStorage.put(mail, expirationTime);
-
         emailService.sendPinToEmail(mail, pin);
-
         return ResponseEntity.ok(createResponse(true, "Your code has been sent to your email address."));
     }
 

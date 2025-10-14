@@ -35,7 +35,6 @@ public class TrustedContactServiceImpl implements TrustedContactService {
     public TrustedContactDTO addTrustedContact(String username, TrustedContact trustedContact) {
         logger.info("Adding trusted contact for user: {}", username);
 
-        // Debug log the incoming data
         logger.debug("Incoming trusted contact data - FullName: {}, Email: {}, Phone: {}, ContactType: {}, Priority: {}",
                 trustedContact.getFullName(), trustedContact.getEmail(), trustedContact.getPhone(),
                 trustedContact.getContactType(), trustedContact.getPriorityOrder());
@@ -49,12 +48,9 @@ public class TrustedContactServiceImpl implements TrustedContactService {
         User user = optional.get();
         logger.debug("Found user: {} with ID: {}", user.getUsername(), user.getId());
 
-        // Clean and validate email
         String email = trustedContact.getEmail().trim().toLowerCase();
         trustedContact.setEmail(email);
-        logger.debug("Normalized email to: {}", email);
 
-        // Check if a contact with this email already exists for this user
         logger.debug("Checking for existing contact with email: {} for user ID: {}", email, user.getId());
         Optional<TrustedContact> existingContact = trustedContractRepository.findByUserIdAndEmail(user.getId(), email);
 
@@ -78,13 +74,11 @@ public class TrustedContactServiceImpl implements TrustedContactService {
 
         trustedContact.setUser(user);
 
-        // Set default priority if not provided
         if (trustedContact.getPriorityOrder() == null) {
             trustedContact.setPriorityOrder(1);
             logger.debug("Set default priority: 1");
         }
 
-        // Set phone to null if empty
         if (trustedContact.getPhone() != null && trustedContact.getPhone().trim().isEmpty()) {
             trustedContact.setPhone(null);
             logger.debug("Set phone to null (was empty)");
@@ -107,7 +101,6 @@ public class TrustedContactServiceImpl implements TrustedContactService {
 
         } catch (DataIntegrityViolationException e) {
             logger.error("Data integrity violation while saving trusted contact for user {}: {}", username, e.getMessage());
-            // Check if it's a unique constraint violation
             if (e.getMessage() != null && (e.getMessage().contains("unique") || e.getMessage().contains("constraint"))) {
                 logger.error("Unique constraint violation detected for email: {}", email);
                 throw new RuntimeException("A contact with this email already exists for your account.");

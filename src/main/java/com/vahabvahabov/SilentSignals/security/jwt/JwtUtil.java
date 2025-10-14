@@ -18,10 +18,10 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret:defaultSecretKeyForDevelopmentOnlyChangeInProduction}")
+    @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration:86400}")
+    @Value("${jwt.expiration}")
     private Long expiration;
 
     private SecretKey getSigningKey() {

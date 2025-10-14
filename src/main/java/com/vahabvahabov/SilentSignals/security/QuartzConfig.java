@@ -22,7 +22,7 @@ public class QuartzConfig {
                 .forJob(sosAlertReminderJobDetail())
                 .withIdentity("sosAlertReminderTrigger")
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                        .withIntervalInMinutes(5)
+                        .withIntervalInMinutes(10)
                         .repeatForever())
                 .build();
     }

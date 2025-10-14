@@ -88,8 +88,6 @@ public class TrustedContactControllerImpl implements TrustedContactController {
 
         try {
             User user = (User) authentication.getPrincipal();
-            logger.info("Getting trusted contacts for CURRENT user: {} (ID: {})", user.getUsername(), user.getId());
-
             List<TrustedContactDTO> contacts = trustedContactService.getAllTrustedContactsByUserId(user.getId());
             logger.info("Retrieved {} trusted contacts for user: {}", contacts.size(), user.getUsername());
             return ResponseEntity.ok(createResponse(true, "Trusted contacts retrieved successfully", contacts));
